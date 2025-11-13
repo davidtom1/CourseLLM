@@ -1,3 +1,16 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "course_data_structures",
+      "description": "Abstract data structures concept",
+      "imageUrl": "https://images.unsplash.com/photo-1668242372382-9e6282c63578?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxhYnN0cmFjdCUyMGRhdGF8ZW58MHx8fHwxNzYyOTkxNjAyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract data"
+    },
+    {
+      "id": "course_operating_systems",
+      "description": "Computer chip and circuits",
+      "imageUrl": "https://images.unsplash.com/photo-1553408226-42ecf81a214c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjb21wdXRlciUyMGNpcmN1aXR8ZW58MHx8fHwxNzYzMDM1OTI2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "computer circuit"
+    }
+  ]
 }
