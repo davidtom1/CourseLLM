@@ -18,9 +18,20 @@ export type GeneratePracticeQuizInput = z.infer<
   typeof GeneratePracticeQuizInputSchema
 >;
 
-const GeneratePracticeQuizOutputSchema = z.object({
-  quiz: z.string().describe('The generated practice quiz.'),
+const QuizQuestionSchema = z.object({
+  question: z.string().describe('The question text.'),
+  options: z.array(z.string()).describe('An array of 4 possible answers.'),
+  correctAnswer: z.string().describe('The correct answer from the options array.'),
 });
+
+const GeneratePracticeQuizOutputSchema = z.object({
+  quiz: z
+    .string()
+    .describe(
+      'A JSON string containing an array of 3 quiz questions. Each question should have a question, options, and correctAnswer.'
+    ),
+});
+
 export type GeneratePracticeQuizOutput = z.infer<
   typeof GeneratePracticeQuizOutputSchema
 >;
@@ -34,28 +45,21 @@ export async function generatePracticeQuiz(
 const prompt = ai.definePrompt({
   name: 'generatePracticeQuizPrompt',
   input: {schema: GeneratePracticeQuizInputSchema},
-  output: {schema: GeneratePracticeQuizOutputSchema},
+  output: {
+    schema: z.object({
+      quiz: z.object({
+        quiz: z.array(QuizQuestionSchema),
+      }),
+    }),
+    format: 'json',
+  },
   prompt: `You are a teaching assistant creating practice quizzes for university students.
 
   Generate a short quiz on the topic of {{{topic}}}. The quiz should consist of 3 multiple choice questions.
-
-  Format the output as a string that can be presented directly to the user.
   
-  For each question, provide 4 options, labeled a), b), c), and d).
+  For each question, provide 4 options. Ensure the correctAnswer exactly matches one of the provided options.
   
-  After all questions, include a section with the correct answers, clearly indicating the correct choice for each question. For example: 'Correct Answer: c) The correct choice'.
-  
-  Do not include a preamble. Start directly with the first question.
-  
-  Example of a single question format:
-  1. What is a data structure?
-  a) A way to store and organize data
-  b) A programming language
-  c) A type of computer
-  d) An algorithm
-  
-  Example for answer format at the end:
-  Correct Answer: a) A way to store and organize data
+  Do not include a preamble.
   `,
 });
 
@@ -67,6 +71,11 @@ const generatePracticeQuizFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    if (!output) {
+      throw new Error('Failed to generate quiz.');
+    }
+    return {
+      quiz: JSON.stringify(output.quiz),
+    };
   }
 );

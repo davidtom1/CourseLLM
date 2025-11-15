@@ -15,32 +15,22 @@ import { useToast } from '@/hooks/use-toast';
 
 type QuizState = 'initial' | 'loading' | 'active' | 'submitted';
 
-// Helper function to parse the AI-generated quiz string
+// Helper function to parse the AI-generated quiz JSON
 function parseQuiz(quizString: string): QuizQuestion[] {
   try {
-    const questions: QuizQuestion[] = [];
-    const questionBlocks = quizString.split(/\d+\.\s+/).filter(Boolean);
+    const data = JSON.parse(quizString);
+    if (!data.quiz || !Array.isArray(data.quiz)) {
+      console.error('Parsed JSON does not contain a quiz array:', data);
+      return [];
+    }
 
-    questionBlocks.forEach((block, index) => {
-      const lines = block.trim().split('\n');
-      const questionText = lines[0];
-      const options = lines.slice(1, -1).map(line => line.replace(/^[a-d]\)\s*/, ''));
-      const correctAnswerLine = lines.slice(-1)[0];
-      const correctAnswerMatch = correctAnswerLine.match(/Correct Answer: [a-d]\) (.+)/);
-      const correctAnswer = correctAnswerMatch ? correctAnswerMatch[1] : '';
-
-      if (questionText && options.length > 0 && correctAnswer) {
-        questions.push({
-          id: `q${index + 1}`,
-          question: questionText,
-          options: options,
-          correctAnswer: correctAnswer,
-        });
-      }
-    });
-    return questions;
+    // Assign IDs to each question
+    return data.quiz.map((q: Omit<QuizQuestion, 'id'>, index: number) => ({
+      ...q,
+      id: `q${index + 1}`,
+    }));
   } catch (error) {
-    console.error('Failed to parse quiz string:', error);
+    console.error('Failed to parse quiz JSON:', error);
     return [];
   }
 }
